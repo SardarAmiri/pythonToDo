@@ -31,7 +31,7 @@ class TodoRequest(BaseModel):
     title: str = Field(min_length=3, max_length=50)
     description: str = Field(min_length=3, max_length=100)
     priority: int = Field(gt=0, le=6)
-    completed: bool
+    complete: bool
 
 
 
@@ -74,7 +74,7 @@ async def update_todo(user: user_dependency, db: db_dependency,todo_request: Tod
     todo.title = todo_request.title
     todo.description = todo_request.description
     todo.priority = todo_request.priority
-    todo.completed = todo_request.completed
+    todo.complete = todo_request.complete
 
     db.add(todo)
     db.commit()
