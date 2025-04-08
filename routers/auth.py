@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from models import Users
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -10,6 +10,7 @@ from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
 from datetime import timedelta, datetime, timezone
+
 
 
 
@@ -75,6 +76,8 @@ class UserRequest(BaseModel):
     last_name: str
     password: str
     role: str
+    phone_number: str 
+
 
 # Read all users
 @router.get("/read_all", status_code=status.HTTP_200_OK)
@@ -93,7 +96,8 @@ async def create_users(db: db_dependency, user_request: UserRequest):
         last_name=user_request.last_name,
         hashed_password=bcrypt_context.hash(user_request.password), 
         role=user_request.role,
-        is_active=True
+        is_active=True,
+        phone_number = user_request.phone_number
     )
     db.add(user_model)
     db.commit()
