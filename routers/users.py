@@ -1,9 +1,9 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
-from models import Users
+from ..models import Users
 from sqlalchemy.orm import Session
-from database import SessionLocal
+from ..database import SessionLocal
 from starlette import status
 from .auth import get_current_user
 from passlib.context import CryptContext
