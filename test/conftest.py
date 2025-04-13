@@ -1,27 +1,27 @@
 import pytest
 from ..models import Todo, Users
-SQLALCHEMY_DATABASE_URL = "postgresql://amiri:amiri1122@localhost/TestTodoApplicationDatabase"
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from ..database import Base
 from passlib.context import CryptContext
 from fastapi.testclient import TestClient
 from ..main import app
-from ..routers.todos import get_current_user
-from ..routers.todos import get_db
+from ..routers.todos import get_current_user, get_db
+#
 
 
 
 
+TEST_SQLALCHEMY_DATABASE_URL = "postgresql://amiri:amiri1122@localhost/TestTodoApplicationDatabase"
+test_engine = create_engine(TEST_SQLALCHEMY_DATABASE_URL)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-
-TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @pytest.fixture
 def client(db):
+    
    
     
     # Override dependencies
@@ -40,17 +40,18 @@ def client(db):
     # Clean up
     app.dependency_overrides.clear()
 
-@pytest.fixture
+@pytest.fixture()
 def db():
-    Base.metadata.create_all(bind=engine)
-    connection = engine.connect()
+    
+    Base.metadata.create_all(bind=test_engine)
+    connection = test_engine.connect()
     transaction = connection.begin()
     db = TestSessionLocal(bind=connection)
     yield db
     db.close()
     transaction.rollback()
     connection.close()
-    Base.metadata.drop_all(bind=engine)
+    Base.metadata.drop_all(bind=test_engine)
 
 @pytest.fixture
 def test_user(db):

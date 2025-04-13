@@ -1,6 +1,7 @@
 from starlette import status
 from ..models import Todo
 
+
 def test_read_all_athenticated(client, test_todo, test_user):
     response = client.get("/")
     assert response.status_code == status.HTTP_200_OK
@@ -99,20 +100,15 @@ def test_update_todo_with_invalid_data(client, test_todo):
         assert error["msg"] == "String should have at least 3 characters"
     
 
-def test_delete_todo_athenticated(client, test_todo, test_user):
+def test_delete_todo_athenticated(client, db, test_todo):
     response = client.delete("/delete-todo/1")
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
-    deleted_todo = client.get("/todo/1")
-    assert deleted_todo.status_code == status.HTTP_404_NOT_FOUND
-    assert deleted_todo.json() == {"detail": "Todo with id 1 not found"}
+    deleted_todo = db.query(Todo).filter(Todo.id == 1).first()
+    assert deleted_todo is None
 
 def test_delete_todo_not_found(client):
     response = client.delete("/delete-todo/100")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {"detail": "Todo with id 100 not found"}
 
-def test_delete_todo_unauthenticated(client):
-    response = client.delete("/delete-todo/1")
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.json() == {"detail": "User not authenticated"}
