@@ -22,7 +22,6 @@ bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 @pytest.fixture
 def client(db):
     
-   
     
     # Override dependencies
     def override_get_db():
@@ -42,7 +41,6 @@ def client(db):
 
 @pytest.fixture()
 def db():
-    
     Base.metadata.create_all(bind=test_engine)
     connection = test_engine.connect()
     transaction = connection.begin()
@@ -52,6 +50,7 @@ def db():
     transaction.rollback()
     connection.close()
     Base.metadata.drop_all(bind=test_engine)
+    
 
 @pytest.fixture
 def test_user(db):
@@ -63,7 +62,7 @@ def test_user(db):
         hashed_password=bcrypt_context.hash("testpass"),
         is_active=True,
         phone_number="09123456789",
-        role="user",
+        role="admin",
     )
     db.add(user)
     db.commit()
